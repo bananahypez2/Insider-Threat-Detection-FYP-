@@ -138,9 +138,8 @@ This project uses the **CERT Insider Threat Test Dataset r4.2**: 1,000 employees
 To run the pipeline yourself, place the extracted dataset as follows:
 
 ```
-r4.2/                     logon.csv, device.csv, file.csv, email.csv, http.csv,
-                          LDAP/, psychometric.csv
-answers/                  ground-truth insider files
+r4.2/logon.csv, device.csv, file.csv, email.csv, http.csv, LDAP/, psychometric.csv
+answers/ground-truth insider files
 context_data/
   ├─ LDAP/<snapshot>.csv  earliest LDAP snapshot, used as inference-time context
   └─ psychometric.csv
@@ -179,6 +178,7 @@ To rebuild everything from raw logs, run the scripts in order: `1. EDA` → `2. 
 
 ```
 Context-Aware Anomaly Detection System/   the Flask application
+├─ context_data
 ├─ Context-Aware Anomaly Detection System.py   routes, scoring, SHAP
 ├─ Preprocess_Raw_Logs.py                      raw logs → 32-feature table
 ├─ models/                                     trained artefacts (.pkl)
@@ -203,9 +203,6 @@ Every reported figure can be traced to a log in `Scripts Code/Outputs/`.
 ---
 
 ## Limitations
-
-Stated plainly, because they bound what the results mean:
-
 - **The dataset is synthetic.** CERT r4.2 models a fictional organisation. Its regularity is almost certainly why AUC reaches 0.9996, and that figure should not be read as real-world performance. Validation on genuine organisational logs is the necessary next step.
 - **The suspicious-URL keyword list is tuned to this dataset** and would need rebuilding elsewhere.
 - **Hyperparameters were not optimised.** Tree count and depth were fixed, not searched.
