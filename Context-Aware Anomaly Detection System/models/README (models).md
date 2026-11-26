@@ -1,7 +1,7 @@
 # Trained model artefacts
 ## Download them
 
-Get all seven files from the [Releases page](../../../releases) and place them in
+Get all seven files from the [Releases page](https://github.com/bananahypez2/Insider-Threat-Detection-FYP-/releases) and place them in
 this folder:
 
 ```
