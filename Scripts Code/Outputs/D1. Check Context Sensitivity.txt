@@ -1,0 +1,267 @@
+python -u "<project>/Cleaning/Script Code\D1. Check Context Sensitivity.py"
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Context-Sensitivity (Counterfactual) Test - Model D
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Feature table rows : 330452
+Model used : RandomForestClassifier
+Number of features : 32
+Real organisational contexts : 107
+Real full identities : 1000
+Malicious days available : 966
+Malicious days under test : 10
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TEST 1 - Swap the job only (role, department, functional unit)
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Each test day is scored again under every real organisational context.
+Behaviour and personality scores are not touched.
+
+Day 1 - DRR0162 on 2010-12-08
+     score with the real job : 0.9189
+     lowest score : 0.49
+     highest score : 0.9189
+     difference : 0.4289
+Day 2 - IKR0401 on 2011-01-21
+     score with the real job : 0.5299
+     lowest score : 0.375
+     highest score : 0.6347
+     difference : 0.2598
+Day 3 - RHL0992 on 2010-08-06
+     score with the real job : 0.9574
+     lowest score : 0.5645
+     highest score : 0.9574
+     difference : 0.3929
+Day 4 - KRL0501 on 2010-12-02
+     score with the real job : 0.9886
+     lowest score : 0.3797
+     highest score : 0.9886
+     difference : 0.6089
+Day 5 - AKR0057 on 2010-10-11
+     score with the real job : 0.9789
+     lowest score : 0.2749
+     highest score : 0.9789
+     difference : 0.704
+Day 6 - EHB0824 on 2010-07-23
+     score with the real job : 0.9049
+     lowest score : 0.5843
+     highest score : 0.9049
+     difference : 0.3206
+Day 7 - VSS0154 on 2010-09-24
+     score with the real job : 0.73
+     lowest score : 0.415
+     highest score : 0.73
+     difference : 0.315
+Day 8 - RAR0725 on 2010-07-06
+     score with the real job : 0.9913
+     lowest score : 0.3116
+     highest score : 0.9913
+     difference : 0.6797
+Day 9 - AKR0057 on 2010-11-15
+     score with the real job : 0.9724
+     lowest score : 0.6785
+     highest score : 0.9778
+     difference : 0.2992
+Day 10 - MOS0047 on 2010-08-02
+     score with the real job : 0.9098
+     lowest score : 0.42
+     highest score : 0.9098
+     difference : 0.4899
+
+Mean difference over 10 days : 0.4499
+Largest difference : 0.704
+Day with the largest difference  : AKR0057 on 2010-10-11
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TEST 2 - Swap the whole identity (job plus Big Five personality)
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+The same test days are scored again under every real full identity.
+Only the behaviour is kept the same this time.
+
+Day 1 - DRR0162 on 2010-12-08
+     score with the real identity : 0.9189
+     lowest score                 : 0.2698
+     highest score                : 0.9189
+     difference                   : 0.6491
+Day 2 - IKR0401 on 2011-01-21
+     score with the real identity : 0.5299
+     lowest score                 : 0.1998
+     highest score                : 0.6149
+     difference                   : 0.415
+Day 3 - RHL0992 on 2010-08-06
+     score with the real identity : 0.9574
+     lowest score                 : 0.4084
+     highest score                : 0.9574
+     difference                   : 0.5489
+Day 4 - KRL0501 on 2010-12-02
+     score with the real identity : 0.9886
+     lowest score                 : 0.21
+     highest score                : 0.9938
+     difference                   : 0.7838
+Day 5 - AKR0057 on 2010-10-11
+     score with the real identity : 0.9789
+     lowest score                 : 0.1549
+     highest score                : 0.9789
+     difference                   : 0.824
+Day 6 - EHB0824 on 2010-07-23
+     score with the real identity : 0.9049
+     lowest score                 : 0.2599
+     highest score                : 0.9049
+     difference                   : 0.6449
+Day 7 - VSS0154 on 2010-09-24
+     score with the real identity : 0.73
+     lowest score                 : 0.2246
+     highest score                : 0.73
+     difference                   : 0.5054
+Day 8 - RAR0725 on 2010-07-06
+     score with the real identity : 0.9913
+     lowest score                 : 0.21
+     highest score                : 0.9913
+     difference                   : 0.7813
+Day 9 - AKR0057 on 2010-11-15
+     score with the real identity : 0.9724
+     lowest score                 : 0.4537
+     highest score                : 0.9724
+     difference                   : 0.5187
+Day 10 - MOS0047 on 2010-08-02
+     score with the real identity : 0.9098
+     lowest score                 : 0.12
+     highest score                : 0.9098
+     difference                   : 0.7899
+
+Mean difference over 10 days : 0.6461
+Largest difference               : 0.824
+Day with the largest difference  : AKR0057 on 2010-10-11
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+COMPARISON - Test 1 against Test 2 on the same days
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+The extra movement in Test 2 is what the personality scores add on top
+of the job title.
+
+Day 1 - DRR0162
+     moved by job only : 0.4289
+     moved by full identity : 0.6491
+     added by personality : 0.2202
+Day 2 - IKR0401
+     moved by job only : 0.2598
+     moved by full identity : 0.415
+     added by personality : 0.1553
+Day 3 - RHL0992
+     moved by job only : 0.3929
+     moved by full identity : 0.5489
+     added by personality : 0.156
+Day 4 - KRL0501
+     moved by job only : 0.6089
+     moved by full identity : 0.7838
+     added by personality : 0.1749
+Day 5 - AKR0057
+     moved by job only : 0.704
+     moved by full identity : 0.824
+     added by personality : 0.1199
+Day 6 - EHB0824
+     moved by job only : 0.3206
+     moved by full identity : 0.6449
+     added by personality : 0.3243
+Day 7 - VSS0154
+     moved by job only : 0.315
+     moved by full identity : 0.5054
+     added by personality : 0.1904
+Day 8 - RAR0725
+     moved by job only : 0.6797
+     moved by full identity : 0.7813
+     added by personality : 0.1016
+Day 9 - AKR0057
+     moved by job only : 0.2992
+     moved by full identity : 0.5187
+     added by personality : 0.2195
+Day 10 - MOS0047
+     moved by job only : 0.4899
+     moved by full identity : 0.7899
+     added by personality : 0.3
+
+Mean movement from the job only      : 0.4499
+Mean movement from the full identity : 0.6461
+Mean added by the personality scores : 0.1962
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+MOST DAMAGING ORGANISATIONAL CONTEXT
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+This is the job that produced the highest average score across all the
+test days, so it is measured over every day and not taken from one day.
+
+Role : AdministrativeAssistant
+Department : 2 - ManufacturingEngineering
+Functional unit : 3 - Manufacturing
+Average score it produced : 0.8432
+Lowest average of any job : 0.4644
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TEST 3 - Reverse test, can a damaging job flag an innocent day
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Ordinary non-malicious days are given the most damaging job found above.
+Their behaviour is not touched. If the job alone was enough to convict
+someone, these scores would cross the 0.50 flagging line.
+
+329486
+Day 1 - MHH0180 on 2010-03-31
+     score with the real job : 0.0
+     score with the damaging job : 0.01
+     change : 0.01
+     flagged at 0.50 : no
+Day 2 - AOS0987 on 2011-02-02
+     score with the real job : 0.0
+     score with the damaging job : 0.0
+     change : 0.0
+     flagged at 0.50 : no
+Day 3 - NKH0807 on 2010-04-12
+     score with the real job : 0.0
+     score with the damaging job : 0.0
+     change : 0.0
+     flagged at 0.50 : no
+Day 4 - KSP0357 on 2010-09-29
+     score with the real job : 0.0
+     score with the damaging job : 0.0
+     change : 0.0
+     flagged at 0.50 : no
+Day 5 - CAN0842 on 2010-09-09
+     score with the real job : 0.0
+     score with the damaging job : 0.01
+     change : 0.01
+     flagged at 0.50 : no
+Day 6 - DOL0332 on 2010-02-11
+     score with the real job : 0.0
+     score with the damaging job : 0.0
+     change : 0.0
+     flagged at 0.50 : no
+Day 7 - DVW0103 on 2010-11-18
+     score with the real job : 0.0
+     score with the damaging job : 0.005
+     change : 0.005
+     flagged at 0.50 : no
+Day 8 - DEB0782 on 2011-03-14
+     score with the real job : 0.0
+     score with the damaging job : 0.005
+     change : 0.005
+     flagged at 0.50 : no
+Day 9 - CCR0863 on 2011-04-27
+     score with the real job : 0.0
+     score with the damaging job : 0.005
+     change : 0.005
+     flagged at 0.50 : no
+Day 10 - CWB0065 on 2010-12-15
+     score with the real job : 0.0
+     score with the damaging job : 0.0
+     change : 0.0
+     flagged at 0.50 : no
+
+Mean change from the damaging job : 0.0035
+Normal days flagged at 0.50 : 0 out of 10
+
+xxxxxxxxxxxxxxxx
+SUMMARY
+xxxxxxxxxxxxxxxx
+1. Context is used. Changing only the job moved the test days by 0.4499 on average.
+2. Personality is used as well. Changing the whole identity moved them by 0.6461 on average, which is 0.1962 more.
+3. Behaviour still decides. Giving ordinary days the most damaging job changed
+   their score by 0.0035 on average and flagged 0 of them.
+Context adjusts the score, but behaviour decides whether a day is flagged.

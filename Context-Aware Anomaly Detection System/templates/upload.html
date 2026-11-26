@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Context-Aware Anomaly Detection Prototype</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div>
+        <h1>Context-Aware Anomaly Detection</h1>
+        <p>CERT r4.2</p>
+      </div>
+    </div>
+    <nav>
+      <a href="{{ url_for('upload') }}" class="active">Upload Data</a>
+      <a href="{{ url_for('results') }}">Results Dashboard</a>
+      <a href="{{ url_for('about') }}">About</a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <div class="page-title">Upload Employee Activity Data</div>
+        <div class="page-sub" id="page-sub">Please upload a preprocessed feature table in CSV file format, the system will score each employee's daily activity</div>
+      </div>
+      <!-- Mode tabs -->
+      <div style="display:flex;gap:4px;background:rgba(255,255,255,0.7);
+                  padding:4px;border-radius:8px;border:1px solid #b7c4db">
+        <button type="button" class="btn sm primary" id="tab-btn-feature"
+                onclick="showTab('feature')" style="padding:7px 16px;font-size:12px">
+          Feature table CSV
+        </button>
+        <button type="button" class="btn sm" id="tab-btn-raw"
+                onclick="showTab('raw')" style="padding:7px 16px;font-size:12px">
+          Raw logs (end-to-end)
+        </button>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} <!-- Get Flask Flash Messages-->
+      {% for category, message in messages %}
+        <div class="alert {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- TAB 1: feature table CSV -->
+    <form method="POST" action="{{ url_for('analyze') }}" enctype="multipart/form-data"
+          id="upload-form" class="tab-panel" data-tab="feature"> <!-- creates upload form for prepocessed CSV, enctype (required for file upload)-->
+      <label for="csv-input" class="upload-zone" id="drop-zone">
+        <div class="upload-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/> <!-- the upload icon for svg -->
+          </svg>
+        </div>
+        <div class="upload-title" id="upload-label">Drag and Drop CSV file or Upload from local device</div>
+        <div class="upload-sub">The CSV file is expected to be a feature table with 32 model features</div>
+        <input type="file" name="csv_file" id="csv-input" accept=".csv"
+               style="display:none" onchange="onFileSelected(this)"/> <!-- onchange, run function when selected -->
+        <button type="submit" class="btn primary" onclick="event.stopPropagation()"> <!-- prevents click event from bubbling up to the label and accidentally reopening file picker -->
+          Analyse data
+        </button>
+      </label>
+    </form>
+
+    <!-- TAB 2: raw logs (end-to-end mode) -->
+    <form method="POST" action="{{ url_for('analyze_raw') }}" enctype="multipart/form-data"
+          class="tab-panel" data-tab="raw" style="display:none">
+      <label for="raw-input" class="upload-zone" id="raw-drop-zone">
+        <div class="upload-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div class="upload-title" id="raw-upload-label">Please upload the raw logs of the employee's activity in a ZIP file, the system will score it appropriately</div>
+        <div class="upload-sub" style="max-width:640px;text-align:center;line-height:1.6">
+          Logs should be in CERT-format raw activity logs composing (logon / device / file / email / http CSVs in a ZIP file)
+          The system will preprocess them into daily behavioural features, including each employee's
+          personalised baseline, then scores them automatically. To have a more accurate detection, please include at least 6 weeks of history
+          so baselines can form.
+        </div>
+        <input type="file" name="raw_files" id="raw-input" multiple accept=".csv,.zip"
+               style="display:none" onchange="onRawSelected(this)"/>
+        <button type="submit" class="btn primary" onclick="event.stopPropagation()">
+          Preprocess &amp; analyse
+        </button>
+      </label>
+    </form>
+
+    <!-- How it works -->
+    <div style="background:rgba(255,255,255,0.55);border-radius:12px;
+                padding:18px 22px;border:1px solid rgba(16,24,40,0.07)">
+      <div style="font-size:11px;font-weight:700;color:#0b2a50;text-transform:uppercase;
+                  letter-spacing:0.5px;margin-bottom:14px">How it works</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);
+                      color:white;font-weight:700;font-size:13px;display:flex;
+                      align-items:center;justify-content:center;flex-shrink:0">1</div>
+          <div>
+            <div style="font-weight:700;font-size:13px;color:#0b2a50;margin-bottom:3px">Upload CSV</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5">
+              Upload a feature table with 32 columns per employee-day row, or raw activity logs in a ZIP file
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);
+                      color:white;font-weight:700;font-size:13px;display:flex;
+                      align-items:center;justify-content:center;flex-shrink:0">2</div>
+          <div>
+            <div style="font-weight:700;font-size:13px;color:#0b2a50;margin-bottom:3px">Score and rank</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5">
+              Random Forest scores each employee and ranks them by risk probability
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);
+                      color:white;font-weight:700;font-size:13px;display:flex;
+                      align-items:center;justify-content:center;flex-shrink:0">3</div>
+          <div>
+            <div style="font-weight:700;font-size:13px;color:#0b2a50;margin-bottom:3px">Explain</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5">
+              Click any flagged employee to see a SHAP feature-contribution chart and which behaviours are contributing to the flag
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="num">32</div>
+        <div class="lbl">Features per row<br>(16 raw features, 8 deviation, 8 contextual)</div>
+      </div>
+      <div class="info-card">
+        <div class="num">0.7820</div>
+        <div class="lbl">Model D F1 score<br>Temporal split<br>AUC = 0.9996</div>
+      </div>
+      <div class="info-card">
+        <div class="num">0.7841</div>
+        <div class="lbl">Model F F1 score<br>Held-out users<br>AUC = 0.9990</div>
+      </div>
+      <div class="info-card">
+        <div class="num" style="color:#27ae60">SHAP</div>
+        <div class="lbl">Provide explanations for Flagging</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function showTab(which) {
+  document.querySelectorAll('.tab-panel').forEach(p => { <!-- Find all elements with class tab-panel -->
+    p.style.display = (p.dataset.tab === which) ? '' : 'none'; <!-- Show selected tab, hide others -->
+  });
+  document.getElementById('tab-btn-feature').classList.toggle('primary', which === 'feature'); <!--Adds/removes primary class on feature button.-->
+  document.getElementById('tab-btn-raw').classList.toggle('primary', which === 'raw'); <!--Adds/removes primary class on raw button.-->
+  document.getElementById('page-sub').textContent = (which === 'feature') 
+    ? "Please upload a preprocessed feature table in CSV file format, the system will score each employee's daily activity"
+    : "Upload raw activity logs, the system preprocesses them into behavioural features, then scores each employee's daily activity"; <!--condition ? value_if_true : value_if_false -->
+}
+
+function onFileSelected(input) { <!--Runs when feature CSV is selected-->
+  const label = document.getElementById('upload-label'); <!--Finds upload label text-->
+  if (input.files && input.files[0]) { <!--Checks whether a file exists-->
+    label.textContent = 'Selected: ' + input.files[0].name; <!--Changes text to show selected filename-->
+  }
+}
+
+function onRawSelected(input) { <!--Runs when raw logs are selected-->
+  const label = document.getElementById('raw-upload-label'); <!--Finds raw upload label-->
+  if (input.files && input.files.length) { <!--Checks if at least one file selected-->
+    label.textContent = 'Selected: ' + (input.files.length === 1
+      ? input.files[0].name : input.files.length + ' files'); <!-- if one file select the one file, else select all the files-->
+  }
+}
+
+function wireDropZone(zoneId, inputId, handler) {
+  const zone = document.getElementById(zoneId); <!--Find the upload box and listen for drag events on it-->
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); }); <!--Do not use your default file-drag behavior (e.preventDefault), when mouse hover add drag to class .upload-zone become .upload-zone drag-->
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag')); <!-- remove drag when mouse not on box-->
+  zone.addEventListener('drop', e => { <!-- When drops file-->
+    e.preventDefault(); <!-- prevent opening in new browser tab-->
+    zone.classList.remove('drag'); <!--remove drag styling-->
+    if (e.dataTransfer.files && e.dataTransfer.files.length) { <!--check if drop files exist-->
+      document.getElementById(inputId).files = e.dataTransfer.files; <!-- put drop files into hidden file input-->
+      handler(document.getElementById(inputId)); <!-- call correct label update function, For raw logs, handler is onRawSelected-->
+    }
+  });
+}
+wireDropZone('drop-zone', 'csv-input', onFileSelected); <!--Enable drag-and-drop for feature CSV upload-->
+wireDropZone('raw-drop-zone', 'raw-input', onRawSelected); <!--Enable drag-and-drop for raw logs upload-->
+</script>
+</body>
+</html>

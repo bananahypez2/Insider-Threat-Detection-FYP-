@@ -1,0 +1,121 @@
+python -u "<project>/Cleaning/Script Code\2. Feature Engineering.py"
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+YEW FARN PING - FEATURE ENGINEERING on CERT r4.2 DATASET
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+STEP 1 - LOADING GROUND TRUTH LABELS
+Total Number of Malicious Users in CERT r4.2: 70
+
+ STEP 1B - EXTRACTING DAY-LEVEL MALICIOUS GROUND TRUTH
+Found 3 r4.2 scenario folders: ['r4.2-1', 'r4.2-2', 'r4.2-3']
+Detail files parsed: 70
+Total rows read: 7323 (parse_errors: 0)
+Malicious users with day-level ground truth: 70
+Total count of users and malicious days (user,date): 966
+Avg malicious days per user: 13.80
+Saved: <project>/Cleaning/malicious_days_ground_truth_v3.csv
+
+STEP 2 - LOADING STATIC CONTEXTUAL FEATURES
+ No. of users in psychometric.csv: 1000 users
+LDAP/2009-12.csv: 1000 users
+Note: business_unit column dropped, this is because it has only a constant value and does not provide any benefit for model training whatsoever
+Only the first file is used from the LDAP because it contains the information of all 1000 users, it is confirmed that the 1000 user did not have any changes to their roles throughout the whole r4.2 dataset.
+
+STEP 3 ENGINEERING LOGON FEATURES
+Shape: (330452, 7)
+
+Step 4 - Engineering Device (USB) Features
+Shape: (55717, 4)
+
+Step 5 Engineering File Features
+Shape: (45907, 4)
+
+Step 6 Engineering Email Features
+Shape: (326985, 6)
+
+Step 7 - Engineering HTTP features
+Shape: (329845, 5)
+
+Step 8 - Merging Previously Engineered Behavioural Features
+  After merging device: (330452, 9)
+  After merging file: (330452, 11)
+  After merging email: (330452, 15)
+  After merging http: (330452, 18)
+
+Merged table shape: (330452, 18)
+
+Step 9 - Personalizing Deviation Features
+Added 8 deviation features
+
+Step 10 - Merging static contextual features
+After psychometric merge: (330452, 31)
+After LDAP merge: (330452, 34)
+
+Step 11 - Encoding Categorical Columns
+Encoded 'role': 42 unique values
+Encoded 'department': 23 unique values
+Encoded 'functional_unit': 7 unique values
+Saved encoder mappings: <project>/Cleaning/models/label_maps.pkl
+
+Step 12 - Labelling Malicious and Non-Malicious
+Normal rows (0)   : 329,486
+Malicious rows (1): 966
+Class imbalance   : 0.292% malicious
+
+Step 13 - Doing the Final Checks
+Total null values  : 0 
+Object-dtype cols  : [] 
+Final table shape  : (330452, 35)
+
+All columns:
+    user                                     str        nulls:0    unique:1000
+    date_only                                object     nulls:0    unique:501
+    logon_count                              float64    nulls:0    unique:10
+    after_hours_logon                        float64    nulls:0    unique:9
+    weekend_logon                            float64    nulls:0    unique:8
+    unique_pcs                               float64    nulls:0    unique:8
+    logoff_count                             int64      nulls:0    unique:8
+    usb_connect_count                        float64    nulls:0    unique:15
+    usb_after_hours                          float64    nulls:0    unique:12
+    file_copy_count                          float64    nulls:0    unique:54
+    file_copy_after_hours                    float64    nulls:0    unique:33
+    emails_total                             float64    nulls:0    unique:37
+    emails_external                          float64    nulls:0    unique:34
+    emails_with_attachment                   float64    nulls:0    unique:21
+    emails_after_hours                       float64    nulls:0    unique:28
+    http_count                               float64    nulls:0    unique:120
+    suspicious_url_count                     float64    nulls:0    unique:83
+    http_after_hours                         float64    nulls:0    unique:136
+    logon_count_deviation                    float64    nulls:0    unique:1313
+    usb_connect_count_deviation              float64    nulls:0    unique:2184
+    file_copy_count_deviation                float64    nulls:0    unique:4722
+    emails_total_deviation                   float64    nulls:0    unique:2627
+    emails_external_deviation                float64    nulls:0    unique:5852
+    http_count_deviation                     float64    nulls:0    unique:1047
+    after_hours_logon_deviation              float64    nulls:0    unique:1169
+    suspicious_url_count_deviation           float64    nulls:0    unique:7199
+    O                                        int64      nulls:0    unique:41
+    C                                        int64      nulls:0    unique:41
+    E                                        int64      nulls:0    unique:41
+    A                                        int64      nulls:0    unique:41
+    N                                        int64      nulls:0    unique:30
+    role_encoded                             int64      nulls:0    unique:42
+    department_encoded                       int64      nulls:0    unique:23
+    functional_unit_encoded                  int64      nulls:0    unique:7
+    label                                    int64      nulls:0    unique:2
+
+Step 14 - Saving Feature Table
+Saved : <project>/Cleaning/feature_table_final.csv
+Size  : 61.1 MB
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+FEATURE ENGINEERING COMPLETE
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+Summary:
+  Rows              : 330,452
+  Columns           : 35
+  Malicious rows    : 966
+  Normal rows       : 329,486
+  Output            : feature_table_final.csv
+

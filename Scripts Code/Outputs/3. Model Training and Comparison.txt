@@ -1,0 +1,53 @@
+python -u "<project>/Cleaning/Script Code\3. Model Training and Comparison.py"
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+CERT r4.2 - Model Training for the prototype Contextual Random Forest (Temporal Split) and Contextual Random Forest (Held-out Users Split)
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+Step 1 - Loading feature table
+  Shape : (330452, 35)
+  Labels: {0: 329486, 1: 966}
+
+Step 2 - Defining feature groups
+  All features (contextual) : 32
+
+Step 3 - Temporal train/test split
+  Train: 246,423 rows  (722 malicious = 0.3%)
+  Test : 84,029 rows  (244 malicious = 0.3%)
+
+Step 3B - Held-out User Split
+  Train users: 700  Test users: 300
+  Train rows : 232,068  Test rows : 98,384
+
+Step 4: Training Model D - Contextual Random Forest Temporal Split
+
+  [D] Model D - Contextual Random Forest Temporal Split
+         Features: 32 columns
+         F1=0.7820  Prec=0.9270  Rec=0.6762  AUC=0.9996
+         TP=165  FN=79  FP=13  TN=83772
+         Saved model/scaler/features as 'D' -> <project>/Cleaning/models
+ Saved: <project>/Cleaning/results/production/report_D.txt
+
+Step 5: Training Model F - Contextual Random Forest Held-out User Split
+
+  [F] Model F - Contextual Random Forest Held-out User Split
+         Features: 32 columns
+         F1=0.7841  Prec=0.8136  Rec=0.7567  AUC=0.9990
+         TP=227  FN=73  FP=52  TN=98032
+         Saved model/scaler/features as 'F' -> <project>/Cleaning/models
+ Saved: <project>/Cleaning/results/production/report_F.txt
+
+Step 6 Saving Metrics Summary for Models
+  Saved: <project>/Cleaning/results/production/production_metrics.csv
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+PRODUCTION TRAINING COMPLETE
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+Model artifacts saved to: <project>/Cleaning/models
+  model_D.pkl, scaler_D.pkl, features_D.pkl  - main detector (F1=0.782, AUC=0.9996)
+  model_F.pkl, scaler_F.pkl, features_F.pkl  - explainability model (F1=0.7841, AUC=0.999)
+
+Reports saved to: <project>/Cleaning/results/production
+  report_D.txt, report_F.txt, production_metrics.csv
+
+

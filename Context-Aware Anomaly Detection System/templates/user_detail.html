@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Context-Aware Anomaly Detection - {{ user.user_id }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div>
+        <h1>Context-Aware Anomaly Detection</h1>
+        <p>CERT r4.2</p>
+      </div>
+    </div>
+    <nav>
+      <a href="{{ url_for('upload') }}">Upload Data</a>
+      <a href="{{ url_for('results') }}">Results Dashboard</a>
+      <a href="{{ url_for('about') }}">About</a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main" style="overflow-y:auto">
+
+    <!-- Header row -->
+    <div style="display:flex;align-items:center;gap:12px">
+      <a href="{{ url_for('results') }}" class="btn sm">Back to results</a>
+      <div class="page-title">User detail - {{ user.user_id }}</div>
+    </div>
+
+    <!-- User summary card -->
+    {% set score = user.risk_score %}
+    {% set risk_cat = 'high' if score >= 0.80 else ('med' if score >= active_threshold else 'low') %}
+    <div class="user-header profile">
+      <div class="avatar">{{ user.user_id[:2] }}</div>
+      <div class="prof-body">
+
+        <div class="prof-top">
+          <div>
+            <div class="prof-subtitle">USER ID</div>
+            <h2>{{ user.user_id }}</h2>
+          </div>
+          <div class="prof-score">
+            <div class="risk-chip {{ risk_cat }}">Risk score: {{ "%.4f"|format(score) }}</div>
+            <div class="prof-meta">
+              Date: {{ user.date }}<br>{{ user.model_label }}<br>Threshold {{ "%.2f"|format(active_threshold) }}
+            </div>
+          </div>
+        </div>
+
+        <div class="prof-divider"></div>
+
+        <div class="prof-grid">
+          <div class="prof-field"><span class="k">Department</span><span class="v">{{ user.department }}</span></div>
+          <div class="prof-field"><span class="k">Role</span><span class="v">{{ user.role }}</span></div>
+          <div class="prof-field"><span class="k">Division</span><span class="v">{{ user.unit }}</span></div>
+        </div>
+
+        <div>
+          <div class="psy-label">Psychometric Scores</div>
+          <div class="psy-row">
+            <div class="psy-item"><div class="n">{{ "%.0f"|format(user.O) }}</div><div class="l">Openness</div></div>
+            <div class="psy-item"><div class="n">{{ "%.0f"|format(user.C) }}</div><div class="l">Conscientiousness</div></div>
+            <div class="psy-item"><div class="n">{{ "%.0f"|format(user.E) }}</div><div class="l">Extraversion</div></div>
+            <div class="psy-item"><div class="n">{{ "%.0f"|format(user.A) }}</div><div class="l">Agreeableness</div></div>
+            <div class="psy-item"><div class="n">{{ "%.0f"|format(user.N) }}</div><div class="l">Neuroticism</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Simple interpretable explanation (auto-generated from SHAP values) -->
+    <div class="shap-panel" style="border-left:4px solid {{ '#c0392b' if user.risk_score >= active_threshold else '#5b88c9' }}">
+      <h3>Explanation - why was this employee flagged?</h3>
+      {% if explanation.is_normal_day %}
+      <p class="expl-lead">{{ explanation.text }}</p>
+      {% else %}
+      <p class="expl-lead">{{ explanation.head }}</p>
+      <div class="expl-items">
+        {% for it in explanation['items'] %}
+        <div class="expl-item {{ it.cat_key }}">
+          <div class="expl-item-main">
+            <span class="cat-tag {{ it.cat_key }}">{{ it.cat_label }}</span>
+            <span class="expl-text">{{ it.text }}</span>
+          </div>
+          <span class="expl-shap">{{ "%+.3f"|format(it.shap) }} to risk</span>
+        </div>
+        {% endfor %}
+      </div>
+      <p class="expl-tail">{{ explanation.tail }}</p>
+      {% endif %}
+      <p style="font-size:11px;color:var(--muted);margin-top:8px">
+        Auto-generated from the SHAP values below displayed in the form of graph<br>
+        Risk score = base rate {{ "%.2f"|format(user.shap_base) }} + all feature contributions
+      </p>
+    </div>
+
+    <!-- SHAP feature-contribution chart plot -->
+    <div class="shap-panel">
+      <h3>SHAP feature contribution graph</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">
+        Each bar shows how much a feature pushed the risk score up (red) or down (green)
+        away from the model's base rate of {{ "%.2f"|format(user.shap_base) }}. <br>
+        Feature with most contribution are at the top, while the least at the bottom.
+      </p>
+      <img src="data:image/png;base64,{{ user.shap_img }}"
+           alt="SHAP feature-contribution chart for {{ user.user_id }}"
+           class="shap-img"/>
+    </div>
+
+    <!-- SHAP breakdown table -->
+    <div class="shap-panel">
+      <h3>Feature Breakdown<br> The Top 12 Contributors</h3>
+      <div style="margin-top:4px">
+        {% set max_abs = shap_table|map(attribute='shap')|map('abs')|max %} <!-- find the maximum absolute SHAP value-->
+        {% for item in shap_table %}
+        {% set pct = [(item.shap|abs / max_abs * 100), 100]|min %} <!-- set the maximum aboslute SHAP value of 100% length of the bar-->
+        <div class="shap-row">
+          <div class="shap-feat" title="{{ item.feature }}">{{ DISPLAY_NAMES_GRAPH.get(item.feature, item.feature) }}</div>
+          <div class="shap-bar-wrap">
+            {% if item.shap > 0 %}
+              <div class="shap-pos" style="width:{{ pct }}%"></div> <!-- Draw Positive Bar if Positive-->
+            {% else %}
+              <div class="shap-neg" style="width:{{ pct }}%"></div> <!-- Draw Negative Bar if Negative-->
+            {% endif %}
+          </div>
+          <div class="shap-val"
+               style="color:{{ '#c0392b' if item.shap > 0 else '#2e9e5b' }}">
+            {{ "%+.4f"|format(item.shap) }} <!--shap value-->
+          </div>
+          <div style="font-size:11.5px;color:var(--text);min-width:70px">
+            val={{ "%.2f"|format(item.value) }} <!--feature value-->
+          </div>
+          <div class="shap-cat">{{ item.category }}</div> <!--feature category-->
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Raw feature values -->
+    <div class="shap-panel" style="margin-bottom:28px">
+      <h3>Raw feature values on {{ user.date }}</h3>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px">
+        {% for feat, val in user.features.items() %}
+        <div style="background:rgba(91,136,201,0.06);border-radius:7px;
+                    padding:9px 12px;border:1px solid rgba(91,136,201,0.15)">
+          <div style="font-size:10.5px;color:var(--muted);margin-bottom:3px" title="{{ feat }}">{{ DISPLAY_NAMES_GRAPH.get(feat, feat) }}</div> <!--Raw Feature Name-->
+          <div style="font-size:14px;font-weight:700;color:var(--text)">{{ "%.3f"|format(val) }}</div> <!-- Raw Feature Value-->
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

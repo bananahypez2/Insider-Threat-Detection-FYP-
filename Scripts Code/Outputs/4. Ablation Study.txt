@@ -1,0 +1,85 @@
+python -u "<project>/Cleaning/Script Code\4. Ablation Study.py"
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+CERT r4.2 - Ablation Study
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+Step 1 - Loading feature table
+Shape : (330452, 35)
+Labels : {0: 329486, 1: 966}
+
+Step 2 - Defining feature groups
+Behavioural only : 16
+All features : 32
+
+Step 3 - Temporal split
+Train : 246,423 rows (722 malicious)
+Test  : 84,029 rows (244 malicious)
+
+Step 4 - Held-out user split
+Train users : 700 
+ Test users : 300
+Train rows : 232,068 (666 malicious)
+Test  rows : 98,384 (300 malicious)
+
+Step 6 - Running configurations (this takes a while)
+
+[A] Semi-Supervised + Uncontextual
+Model : Isolation Forest
+Features : 16
+F1=0.0065 Prec=0.0044 Rec=0.0123 AUC=0.7538
+
+[B] Semi-Supervised + Contextual
+Model : Isolation Forest
+Features : 32
+F1=0.0089 Prec=0.0061 Rec=0.0164 AUC=0.8100
+
+[C] Supervised + Uncontextual
+Model : Random Forest
+Features : 16
+F1=0.6059 Prec=0.6821 Rec=0.5451 AUC=0.9917
+
+[D] Supervised + Contextual
+Model : Random Forest
+Features : 32
+F1=0.7820 Prec=0.9270 Rec=0.6762 AUC=0.9996
+
+[E] Held-out Users + Uncontextual
+Model : Random Forest
+Features : 16
+F1=0.5615 Prec=0.5329 Rec=0.5933 AUC=0.9839
+
+[F] Held-out Users + Contextual
+Model : Random Forest
+Features : 32
+F1=0.7841 Prec=0.8136 Rec=0.7567 AUC=0.9990
+
+Step 7 - Results
++-----+----------------------------------------+-------------------+------+--------+--------+--------+
+| Cfg | Configuration                          | Model             | Feat |     F1 |   Prec |    AUC |
++-----+----------------------------------------+-------------------+------+--------+--------+--------+
+|  A  | Semi-Supervised + Uncontextual         | Isolation Forest  |   16 | 0.0065 | 0.0044 | 0.7538 |
+|  B  | Semi-Supervised + Contextual           | Isolation Forest  |   32 | 0.0089 | 0.0061 | 0.8100 |
+|  C  | Supervised + Uncontextual              | Random Forest     |   16 | 0.6059 | 0.6821 | 0.9917 |
+|  D  | Supervised + Contextual                | Random Forest     |   32 | 0.7820 | 0.9270 | 0.9996 |
+|  E  | Held-out Users + Uncontextual          | Random Forest     |   16 | 0.5615 | 0.5329 | 0.9839 |
+|  F  | Held-out Users + Contextual            | Random Forest     |   32 | 0.7841 | 0.8136 | 0.9990 |
++-----+----------------------------------------+-------------------+------+--------+--------+--------+
+
+Core comparisons
+Context effect, temporal split : F1 0.6059 -> 0.782 (C vs D, delta = +0.1761)
+Context effect, held-out users : F1 0.5615 -> 0.7841 (E vs F, delta = +0.2226)
+Supervised vs Semi-supervised : F1 0.0089 -> 0.782 (B vs D, delta = +0.7731)
+Temporal vs held-out (contextual): F1 0.782 -> 0.7841 (D vs F, delta = +0.0021)
+
+Saved: <project>/Cleaning/results/ablation/ablation_results.csv
+
+Step 8 - Seed robustness (E and F)
+seed  42 : E F1 = 0.5615   F F1 = 0.7841
+seed   7 : E F1 = 0.3327   F F1 = 0.6884
+seed  21 : E F1 = 0.6068   F F1 = 0.8014
+seed  99 : E F1 = 0.5206   F F1 = 0.7300
+seed 123 : E F1 = 0.4801   F F1 = 0.7474
+
+E (uncontextual) : mean 0.5003  std 0.0938
+F (contextual)   : mean 0.7503  std 0.0400
+Saved: <project>/Cleaning/results/ablation/robustness_check_E_F.csv

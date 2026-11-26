@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Context-Aware Anomaly Detection - About</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div>
+        <h1>Context-Aware Anomaly Detection</h1>
+        <p>CERT r4.2</p>
+      </div>
+    </div>
+    <nav>
+      <a href="{{ url_for('upload') }}">Upload Data</a>
+      <a href="{{ url_for('results') }}">Results Dashboard</a>
+      <a href="{{ url_for('about') }}" class="active">About</a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main" style="overflow-y:auto">
+
+    <div>
+      <div class="page-title">About this system</div>
+      <div class="page-sub">Context-Aware Anomaly Detection</div>
+    </div>
+
+    <!-- System overview -->
+    <div class="about-card">
+      <h3 class="section-label">System overview</h3>
+
+      <div class="ov-title">
+        <div class="k">Project title</div>
+        <div class="v">Context-Aware Anomaly Detection for Suspicious User Behaviour in
+          System Logs Using Machine Learning</div>
+      </div>
+
+      <div class="ov-grid">
+        <div class="ov-item">
+          <div class="k">Developer</div>
+          <div class="v">Yew Farn Ping</div>
+        </div>
+        <div class="ov-item">
+          <div class="k">University</div>
+          <div class="v">Asia Pacific University (APU)</div>
+        </div>
+        <div class="ov-item">
+          <div class="k">Dataset</div>
+          <div class="v">CERT Insider Threat Dataset r4.2 (CMU)</div>
+        </div>
+        <div class="ov-item">
+          <div class="k">Methodology</div>
+          <div class="v">CRISP-DM</div>
+        </div>
+        <div class="ov-item">
+          <div class="k">Model</div>
+          <div class="v">Random Forest + SMOTE</div>
+        </div>
+        <div class="ov-item">
+          <div class="k">Explainability</div>
+          <div class="v">SHAP</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dataset stats -->
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="num">330,452</div>
+        <div class="lbl">Total rows in dataset</div>
+      </div>
+      <div class="info-card">
+        <div class="num" style="color:var(--danger)">966</div>
+        <div class="lbl">Confirmed malicious rows (0.29%)</div>
+      </div>
+      <div class="info-card">
+        <div class="num">32</div>
+        <div class="lbl">Features per employee-day</div>
+      </div>
+      <div class="info-card">
+        <div class="num">70</div>
+        <div class="lbl">Insider threat users</div>
+      </div>
+    </div>
+
+    <!-- Model comparison -->
+    <div class="about-card">
+      <h3 class="section-label">Model evaluation</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="background:var(--accent)">
+            <th style="padding:10px 14px;text-align:left;color:white;font-size:11.5px;
+                       text-transform:uppercase;letter-spacing:0.4px">Metric</th>
+            <th style="padding:10px 14px;text-align:center;color:white;font-size:11.5px;
+                       text-transform:uppercase;letter-spacing:0.4px">Model D - Temporal Split</th>
+            <th style="padding:10px 14px;text-align:center;color:white;font-size:11.5px;
+                       text-transform:uppercase;letter-spacing:0.4px">Model F - Held-Out Users</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid rgba(0,0,0,0.05)">
+            <td style="padding:10px 14px;color:var(--muted);font-size:12px">Split strategy</td>
+            <td style="padding:10px 14px;text-align:center">Trained on 2010 data and Tested on 2011 data</td>
+            <td style="padding:10px 14px;text-align:center">Trained on chosen users and Tested on unseen users</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(0,0,0,0.05)">
+            <td style="padding:10px 14px;color:var(--muted);font-size:12px">F1 Score</td>
+            <td style="padding:10px 14px;text-align:center;font-weight:700;color:#0b2a50">0.7820</td>
+            <td style="padding:10px 14px;text-align:center;font-weight:700;color:#0b2a50">0.7841</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(0,0,0,0.05)">
+            <td style="padding:10px 14px;color:var(--muted);font-size:12px">AUC-ROC</td>
+            <td style="padding:10px 14px;text-align:center;font-weight:700;color:#0b2a50">0.9996</td>
+            <td style="padding:10px 14px;text-align:center;font-weight:700;color:#0b2a50">0.9990</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(0,0,0,0.05)">
+            <td style="padding:10px 14px;color:var(--muted);font-size:12px">Algorithm</td>
+            <td style="padding:10px 14px;text-align:center">Random Forest + SMOTE</td>
+            <td style="padding:10px 14px;text-align:center">Random Forest + SMOTE</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 14px;color:var(--muted);font-size:12px">Purpose</td>
+            <td style="padding:10px 14px;text-align:center;font-size:12px;color:var(--muted)">
+              Primary production model
+            </td>
+            <td style="padding:10px 14px;text-align:center;font-size:12px;color:var(--muted)">
+              Proves production model is trained on behaviour, F1 score remain stable on unseen users
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Ablation study & explainability -->
+    <div class="about-card">
+      <h3 class="section-label">Contextual Contributions</h3>
+
+      <div class="find-grid" style="grid-template-columns: minmax(0,10000px);">
+        <div class="find">
+          <div class="big">+0.1761</div>
+          <div class="sub">F1 increase from contextual features</div>
+          <div class="cap">Behavioural-only (Config C) 0.6059 |
+            Contextual (Config D) 0.7820</div>
+        </div>
+      </div>
+
+      <div class="find-note">
+        Adding contextual features (deviation baselines + psychometrics + LDAP roles) to
+        behavioural features alone measurably improves detection, confirming the core thesis
+        that <strong>contextual awareness helps</strong>.
+      </div>
+    </div>
+
+    <!-- Feature categories -->
+    <div class="about-card">
+      <h3 class="section-label">Feature categories (32 total)</h3>
+      <div class="feat-grid">
+
+        <div class="feat-card c1">
+          <div class="feat-head">
+            <span class="name">Behavioural raw</span>
+            <span class="feat-count">16</span>
+          </div>
+          <div class="chips">
+            <span class="chip">logon_count</span>
+            <span class="chip">logoff_count</span>
+            <span class="chip">after_hours_logon</span>
+            <span class="chip">weekend_logon</span>
+            <span class="chip">unique_pcs</span>
+            <span class="chip">usb_connect_count</span>
+            <span class="chip">usb_after_hours</span>
+            <span class="chip">file_copy_count</span>
+            <span class="chip">file_copy_after_hours</span>
+            <span class="chip">emails_total</span>
+            <span class="chip">emails_external</span>
+            <span class="chip">emails_with_attachment</span>
+            <span class="chip">emails_after_hours</span>
+            <span class="chip">http_count</span>
+            <span class="chip">suspicious_url_count</span>
+            <span class="chip">http_after_hours</span>
+          </div>
+        </div>
+
+        <div class="feat-card c2">
+          <div class="feat-head">
+            <span class="name">Personalised deviation</span>
+            <span class="feat-count">8</span>
+          </div>
+          <div class="chips">
+            <span class="chip">logon_count_deviation</span>
+            <span class="chip">usb_connect_count_deviation</span>
+            <span class="chip">file_copy_count_deviation</span>
+            <span class="chip">emails_total_deviation</span>
+            <span class="chip">emails_external_deviation</span>
+            <span class="chip">http_count_deviation</span>
+            <span class="chip">after_hours_logon_deviation</span>
+            <span class="chip">suspicious_url_count_deviation</span>
+          </div>
+          <div class="feat-note">Deviation is calculated as the mean of previous 30 activity day logs</div>
+        </div>
+
+        <div class="feat-card c3">
+          <div class="feat-head">
+            <span class="name">Psychometric - Big Five Personalities</span>
+            <span class="feat-count">5</span>
+          </div>
+          <div class="chips">
+            <span class="chip word">Openness</span>
+            <span class="chip word">Conscientiousness</span>
+            <span class="chip word">Extraversion</span>
+            <span class="chip word">Agreeableness</span>
+            <span class="chip word">Neuroticism</span>
+          </div>
+          <div class="feat-note">Permanent for each user from psychometric.csv.</div>
+        </div>
+
+        <div class="feat-card c4">
+          <div class="feat-head">
+            <span class="name">Contextual role / department</span>
+            <span class="feat-count">3</span>
+          </div>
+          <div class="chips">
+            <span class="chip">role_encoded</span>
+            <span class="chip">department_encoded</span>
+            <span class="chip">functional_unit_encoded</span>
+          </div>
+          <div class="feat-note">Permanent for each user from LDAP first snapshot.<br>
+            Confirmed thah <strong>No</strong> users changed role between the first and last snapshot.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Data privacy -->
+    <div class="about-card" style="margin-bottom:28px">
+      <h3 class="section-label">Data privacy</h3>
+      <div class="privacy-note">
+        All processing runs locally and nothing leaves this machine. Training and demos use
+        only the fully synthetic CERT r4.2 dataset no real employee data, and each data is anonymised. Real deployment would require organisational consent and appropriate
+        data protection controls.
+      </div>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

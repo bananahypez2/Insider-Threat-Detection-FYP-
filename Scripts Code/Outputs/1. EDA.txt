@@ -1,0 +1,284 @@
+python -u "<project>/Cleaning/Script Code\1. EDA.py"
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Executing File Verification
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+File 'logon.csv' is present at the location. (55.8 MB)
+File 'http.csv' is present at the location. (13,862.9 MB)
+File 'email.csv' is present at the location. (1,299.0 MB)
+File 'device.csv' is present at the location. (27.6 MB)
+File 'psychometric.csv' is present at the location. (0.0 MB)
+File 'file.csv' is present at the location. (184.1 MB)
+  FOUND  : LDAP/ folder (18 snapshot files)
+  FOUND  : insiders.csv (in answers folder)
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Loading ground truth from insiders.csv
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Columns : ['dataset', 'scenario', 'details', 'user', 'start', 'end']
+Total Records : 191
+  'dataset' dtype: float64
+  Sample values  : [2.  3.1 3.2 4.1 4.2]
+
+Total number of malicious users across all datasets: 191
+Total number of malicious users in r4.2 dataset: 70
+ malicious r4.2 user IDs: ['AAF0535', 'AAM0658', 'ABC0174', 'AJR0932', 'AKR0057', 'BBS0039', 'BDV0168', 'BIH0745', 'BLS0678', 'BSS0369', 'BTL0226', 'CAH0936', 'CCA0046', 'CCL0068', 'CEJ0109', 'CQW0652', 'CSC0217', 'DCH0843', 'DIB0285', 'DRR0162', 'EDB0714', 'EGD0132', 'EHB0824', 'EHD0584', 'FMG0527', 'FSC0601', 'FTM0406', 'GHL0460', 'GTD0219', 'HBO0413', 'HJB0742', 'HXL0968', 'IJM0776', 'IKR0401', 'IUB0565', 'JGT0221', 'JJM0203', 'JLM0364', 'JMB0308', 'JRG0207', 'JTM0223', 'KLH0596', 'KPC0073', 'KRL0501', 'LCC0819', 'LJR0523', 'LQC0479', 'MAR0955', 'MAS0025', 'MCF0600', 'MDH0580', 'MOS0047', 'MPM0220', 'MSO0222', 'MYD0978', 'NWT0098', 'PNL0301', 'PPF0435', 'PSF0133', 'RAB0589', 'RAR0725', 'RGG0064', 'RHL0992', 'RKD0604', 'RMW0542', 'TAP0551', 'TNM0961', 'VSS0154', 'WDD0366', 'XHW0498']
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+STEP 2b - SCENARIO DETAIL FILE STRUCTURE
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  r4.2 is a 'dense needle' dataset with MANY instances per scenario.
+  Each r4.2-N subfolder contains one detail file per insider user,
+  listing the EXACT log lines that is their attack.
+
+  Scenario folders found: ['r4.2-1', 'r4.2-2', 'r4.2-3']
+  r4.2-1: 30 detail files
+  r4.2-2: 30 detail files
+  r4.2-3: 10 detail files
+  Total detail files (should match malicious user count): 70
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+STEP 2c - insiders.csv START/END COLUMN CHECK
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  insiders.csv also contains 'start' and 'end' timestamps per user,
+  representing the first and last event in their scenario detail file.
+
+   user  scenario               start                 end
+AAM0658         1 2010-10-23 01:34:19 2010-10-29 05:23:28
+AJR0932         1 2010-09-10 19:12:01 2010-09-18 02:02:51
+BDV0168         1 2010-07-30 19:56:44 2010-08-10 05:16:41
+BIH0745         1 2010-07-13 20:15:23 2010-07-13 21:20:44
+BLS0678         1 2010-09-21 01:16:22 2010-09-30 04:48:19
+BTL0226         1 2010-10-06 22:25:52 2010-10-14 06:43:29
+CAH0936         1 2010-08-11 04:00:08 2010-08-12 23:56:19
+DCH0843         1 2011-02-04 07:08:00 2011-02-04 07:36:05
+EHB0824         1 2010-07-22 21:48:43 2010-07-29 01:08:41
+EHD0584         1 2010-10-02 03:46:16 2010-10-08 22:26:26
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Loading and sampling data from each file
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  NOTE: http.csv and email.csv are SAMPLED here for EDA speed.
+  Feature engineering uses the COMPLETE files (chunked reading).
+
+--- logon.csv (full file) ---
+  Shape   : 854,859 rows x 5 columns
+  Columns : ['id', 'date', 'user', 'pc', 'activity']
+  Nulls   : 0 total
+  Users   : 1000 unique
+  Dates   : 2010-01-02 06:49:00  ->  2011-05-17 06:43:35
+  Activity counts:
+activity
+Logon     470591
+Logoff    384268
+
+  Sample rows:
+                      id                date    user      pc activity
+{X1D9-S0ES98JV-5357PWMI} 2010-01-02 06:49:00 NGF0157 PC-6056    Logon
+{G2B3-L6EJ61GT-2222RKSO} 2010-01-02 06:50:00 LRR0148 PC-4275    Logon
+{U6Q3-U0WE70UA-3770UREL} 2010-01-02 06:53:04 LRR0148 PC-4124    Logon
+
+--- device.csv (full file) ---
+  Shape   : 405,380 rows x 5 columns
+  Columns : ['id', 'date', 'user', 'pc', 'activity']
+  Nulls   : 0 total
+  Users   : 265 unique
+  Dates   : 2010-01-02 07:21:06  ->  2011-05-16 23:22:34
+  Activity counts:
+activity
+Connect       203339
+Disconnect    202041
+
+  Sample rows:
+                      id                date    user      pc   activity
+{J1S3-L9UU75BQ-7790ATPL} 2010-01-02 07:21:06 MOH0273 PC-6699    Connect
+{N7B5-Y7BB27SI-2946PUJK} 2010-01-02 07:37:41 MOH0273 PC-6699 Disconnect
+{U1V9-Z7XT67KV-5649MYHI} 2010-01-02 07:59:11 HPH0075 PC-2417    Connect
+
+--- file.csv (full file) ---
+  Shape   : 445,581 rows x 6 columns
+  Columns : ['id', 'date', 'user', 'pc', 'filename', 'content']
+  Nulls   : 0 total
+  Users   : 264 unique
+  Dates   : 2010-01-02 07:23:14  ->  2011-05-16 23:22:34
+
+  Sample rows:
+                      id                date    user      pc     filename                                                                                                                                                                                                                                                                                                                                                                                                               content
+{L9G8-J9QE34VM-2834VDPB} 2010-01-02 07:23:14 MOH0273 PC-6699 EYPC9Y08.doc                                                                                                                                         D0-CF-11-E0-A1-B1-1A-E1 during difficulty overall cannons nonexistent threw authors leadership by rather under upper william an tip few savage expedition survey again trumbull could veteran too clearly single peak away own praise them snapped vessels against all toward
+{H0W6-L4FG38XG-9897XTEN} 2010-01-02 07:26:19 MOH0273 PC-6699 N3LTSU3O.pdf 25-50-44-46-2D carpenters 25 landed strait display channel boats difficulty august 14 south plattsburgh dc effusive earnest roads added find prevent march nonexistent first large strait garage recently strait leading a about young discovery manage navigable draw paid 48 england four run negotiating pushing inferior 8 inferior finally finally used drew mass howe 200 74 it charge cause all advanced world
+{M3Z0-O2KK89OX-5716MBIM} 2010-01-02 08:12:03 HPH0075 PC-2417 D3D3WC9W.doc                                                                                                                                                                                             D0-CF-11-E0-A1-B1-1A-E1 union 24 declined imposed brain employee 21 low action deadlines rear excitement preference toward bullet frank analysis 393 went march hear again floor subdued supreme about do yes up bay ever
+
+--- psychometric.csv (full file) ---
+  Shape   : 1,000 rows x 7 columns
+  Columns : ['employee_name', 'user_id', 'O', 'C', 'E', 'A', 'N']
+  Nulls   : 0 total
+
+  Sample rows:
+          employee_name user_id  O  C  E  A  N
+       Calvin Edan Love CEL0561 40 39 36 19 40
+Christine Reagan Deleon CRD0624 26 22 17 39 32
+  Jade Felicia Caldwell JFC0557 22 16 23 40 33
+
+--- http.csv (first 200,000 rows sampled) ---
+  Shape   : 200,000 rows x 6 columns
+  Columns : ['id', 'date', 'user', 'pc', 'url', 'content']
+  Nulls   : 0 total
+  Users   : 1000 unique
+  Dates   : 2010-01-02 06:55:16  ->  2010-01-06 09:51:11
+
+  Sample rows:
+                      id                date    user      pc                                                                                                                     url                                                                                                                                                                                                                                                                                                                                content
+{V1Y4-S2IR20QU-6154HFXJ} 2010-01-02 06:55:16 LRR0148 PC-4275                                             http://msn.com/The_Human_Centipede_First_Sequence/katsuro/arjf309875127.htm remain representatives consensus concert although connect component collaborated mind sea 200 decision mixture regarding days warners rich fifth 1991 return 1988 apologized united crew tension particular allied rhythm making japanese enhance pop myself whole allmusic bras at focused throughout another touches want references
+{Q5R1-T3EF87UE-2395RWZS} 2010-01-02 07:00:13 NGF0157 PC-6056 http://urbanspoon.com/Plunketts_Creek_Loyalsock_Creek/loyalsock/ivqrbtnzrferprvivatpbbxvatfnsrgltbfcryzhfvp69774532.jsp                                                                                                                       festival off northwards than congestion partnership married 1830 acquired gentleman closely 17 take 1841 hundreds indicated allowing order characters disjunct hub temperature examples expanded adapted tribute
+{X9O1-O0XW52VO-5806RPHG} 2010-01-02 07:03:46 NGF0157 PC-6056                                              http://aa.com/Rhodocene/rhodocenium/fhaavatqrfxgbcrkrphgvir1766627142.html                                                                            long away reorganized baldwin seth business 1888 while trail auction took joseph legislative prohibiting 4000 within heirs incorporated commerce years five length accepted researchers relatively del rearing authorities secondary energetic walls single
+
+--- email.csv (first 200,000 rows sampled) ---
+  Shape   : 200,000 rows x 11 columns
+  Columns : ['id', 'date', 'user', 'pc', 'to', 'cc', 'bcc', 'from', 'size', 'attachments', 'content']
+  Nulls   : 284824 total
+  Users   : 1000 unique
+  Dates   : 2010-01-02 07:11:45  ->  2010-02-05 14:43:17
+
+  Sample rows:
+                      id                date    user      pc                                                         to                              cc bcc                       from  size  attachments                                                                                                                                                                                                                                                                                                                                                                                                                         content
+{R3I7-S4TX96FG-8219JWFF} 2010-01-02 07:11:45 LAP0338 PC-5758 Dean.Flynn.Hines@dtaa.com;Wade_Harrison@lockheedmartin.com Nathaniel.Hunter.Heath@dtaa.com NaN  Lynn.Adena.Pratt@dtaa.com 25830            0 middle f2 systems 4 july techniques powerful destroyed who larger speeds plains part paul hold like followed over decrease actual training international addition geographically side able 34 29 such some appear prairies still 2009 succession yet 23 months mid america could most especially 34 off descend 2010 thus officially southward slope pass finland needed 2009 gulf stick possibility hall 49 montreal kick gulf
+{R0R9-E4GL59IK-2907OSWJ} 2010-01-02 07:12:16 MOH0273 PC-6699                                Odonnell-Gage@bellsouth.net                             NaN NaN        MOH68@optonline.net 29942            0                                                                                                             the breaking called allied reservations former further victories casualties one 18 douglas well sea until difficulty slopes coast message sailed remaining baltic awarded service sending restoration along z33 fjord village experience status cross entrance crashed review midnight up wearing eat glass six own
+{G2B2-A8XY58CP-2847ZJZL} 2010-01-02 07:13:00 LAP0338 PC-5758                                 Penelope_Colon@netzero.com                             NaN NaN Lynn_A_Pratt@earthlink.net 28780            0                                                                                                                                         slowly this uncinus winter beneath addition exist powered circumhorizontal contain one seasonally off glenn make addition lowered spot visible trigger 37 tails slowly two typically within dissipates then via researchers for 2008 like neptune wind he york entirely located contain
+
+--- LDAP/2009-12.csv (first month) (full file) ---
+  Shape   : 1,000 rows x 9 columns
+  Columns : ['employee_name', 'user_id', 'email', 'role', 'business_unit', 'functional_unit', 'department', 'team', 'supervisor']
+  Nulls   : 144 total
+
+  Sample rows:
+          employee_name user_id                            email               role  business_unit            functional_unit             department              team                 supervisor
+       Calvin Edan Love CEL0561        Calvin.Edan.Love@dtaa.com ComputerProgrammer              1 2 - ResearchAndEngineering 2 - SoftwareManagement      3 - Software Stephanie Briar Harrington
+Christine Reagan Deleon CRD0624 Christine.Reagan.Deleon@dtaa.com           Salesman              1      5 - SalesAndMarketing              2 - Sales 3 - RegionalSales          Winter Veda Burks
+  Jade Felicia Caldwell JFC0557   Jade.Felicia.Caldwell@dtaa.com   SoftwareEngineer              1 2 - ResearchAndEngineering 2 - SoftwareManagement      3 - Software Stephanie Briar Harrington
+
+  NOTE on file.csv (per CERT r4.2 readme):
+  Each row represents a FILE COPY TO REMOVABLE MEDIA (USB/external drive).
+  This is NOT general file access - it specifically captures exfiltration-
+  relevant file copy activity, making it a strong insider threat signal.
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+STEP 4 - EVENT VOLUME SUMMARY (note: http.csv and email.csv are sampled, aka not full file
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  logon          : 854,859 rows 
+  device         : 405,380 rows 
+  file           : 445,581 rows 
+  psychometric   : 1,000 rows 
+  http           : 200,000 rows (sampled)
+  email          : 200,000 rows (sampled)
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+STEP 5 - Malicious vs Normal Users (logon.csv)
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+  Logon events by label:
+user_type
+normal user                  805332
+confirmed insider account     49527
+
+  Unique users total      : 1000
+  Confirmed Insider Accounts : 70
+  Normal users            : 930
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+STEP 6 - Psychometric Data
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+  All columns: ['employee_name', 'user_id', 'O', 'C', 'E', 'A', 'N']
+
+  Full sample (first 5 rows):
+          employee_name user_id  O  C  E  A  N
+       Calvin Edan Love CEL0561 40 39 36 19 40
+Christine Reagan Deleon CRD0624 26 22 17 39 32
+  Jade Felicia Caldwell JFC0557 22 16 23 40 33
+ Aquila Stewart Dejesus ASD0577 40 48 36 14 37
+      Micah Abdul Rojas MAR0955 36 44 23 44 25
+
+  Numeric column stats (O=Openness, C=Conscientiousness, E=Extraversion,
+  A=Agreeableness, N=Neuroticism):
+                 O            C           E            A            N
+count  1000.000000  1000.000000  1000.00000  1000.000000  1000.000000
+mean     33.173000    30.653000    29.19700    28.821000    29.608000
+std      10.642007    11.291505    10.95647    11.170844     4.938494
+min      10.000000    10.000000    10.00000    10.000000    14.000000
+25%      23.000000    20.000000    19.00000    19.000000    26.000000
+50%      36.000000    33.000000    28.00000    27.000000    29.000000
+75%      42.000000    40.000000    39.00000    39.000000    33.000000
+max      50.000000    50.000000    50.00000    50.000000    49.000000
+
+  Mean trait scores - insider accounts vs normal users:
+               O      C     E      A      N
+user_type                                  
+insider    35.10  32.53  27.8  26.61  29.41
+normal     33.03  30.51  29.3  28.99  29.62
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+STEP 6b - AFTER-HOURS ACTIVITY DISTRIBUTION
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+  Logon events outside 8am-6pm: 40.22%
+  Hour distribution:
+hour
+0       4243
+1       4530
+2       4433
+3       4555
+4       4600
+5       5166
+6       6749
+7     149697
+8     141848
+9      51658
+10      9495
+11     18790
+12     30403
+13     30813
+14     13547
+15     39698
+16     82514
+17     92291
+18     84498
+19     35382
+20     10367
+21     18426
+22      5932
+23      5224
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+STEP 6c - LDAP VALIDATION (ALL 18 SNAPSHOTS)
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  18 monthly snapshot files found in LDAP/
+  Checking user counts and role/department stability across all snapshots...
+
+  User count per snapshot (first and last):
+    2009-12.csv: 1000 unique users
+    2011-05.csv: 845 unique users
+  Total unique users across all 18 snapshots: 1000
+
+  Users with role changes across 18 snapshots    : 0
+  Users with department changes across 18 snapshots: 0
+  Superset check PASSED: file 0 (2009-12.csv) covers all 1000 users seen in any snapshot.
+  Using only the first LDAP snapshot is VALID for this dataset.
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+STEP 7 - Generating Plots
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ Plot saved: <project>/Cleaning/eda_outputs/event_volume_plot1.png
+ Plot saved: <project>/Cleaning/eda_outputs/logon_monthly_plot2.png
+ Plot saved: <project>/Cleaning/eda_outputs/logon_users_plot3.png
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+EDA completed. Plots saved in the dataset location.
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+Summary of key EDA findings:
+  - r4.2 has exactly 70 confirmed insider users
+  - LDAP: 0 role/department changes across all 18 monthly snapshots
+  - LDAP: file 0 (2009-12.csv) covers all users 
+  - file.csv records FILE COPIES TO REMOVABLE MEDIA only (per CERT readme)
+  - http.csv and email.csv were SAMPLED only to 200,000 rows 
+Outputs saved to: <project>/Cleaning/eda_outputs
+

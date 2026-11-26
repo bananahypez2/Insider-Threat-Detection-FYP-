@@ -1,0 +1,50 @@
+python -u "<project>/Cleaning/Script Code\5. Rule Based Baseline.py"
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+CERT r4.2 - Rule-Based Baseline
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Test period rows : 84029
+Malicious days : 244
+Split date : 2011-01-01
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+THE RULES
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+R1 after-hours with USB : after_hours_logon >= 1 AND usb_connect_count >= 1
+R2 file copies          : file_copy_count >= 10
+R3 suspicious sites     : suspicious_url_count >= 5
+R4 USB connections      : usb_connect_count >= 3
+R5 weekend copying      : weekend_logon >= 1 AND file_copy_count >= 1
+R6 after-hours volume   : after_hours_logon >= 2
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ALL SIX RULES TOGETHER
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Days flagged : 31559 out of 84029
+F1 : 0.0124
+Precision : 0.0062
+Recall : 0.8074
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+COMPARISON WITH THE MACHINE LEARNING MODELS
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+R0 - Rule-based
+   F1        : 0.0124
+   Precision : 0.0062
+   Recall    : 0.8074
+C - Machine learning, no context
+   F1        : 0.6059
+   Precision : 0.6821
+   Recall    : 0.5451
+D - Machine learning, with context
+   F1        : 0.782
+   Precision : 0.927
+   Recall    : 0.6762
+
+Saving results ...
+Saved: <project>/Cleaning/results/rule_based/rule_baseline_results.csv
+Saved: <project>/Cleaning/results/rule_based/rule_baseline_report.txt
+
+xxxxxx
+DONE
+xxxxxx

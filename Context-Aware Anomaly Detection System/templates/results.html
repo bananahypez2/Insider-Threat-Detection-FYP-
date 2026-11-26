@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Context-Aware Anomaly Detection - Results</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div>
+        <h1>Context-Aware Anomaly Detection</h1>
+        <p>CERT r4.2</p>
+      </div>
+    </div>
+    <nav>
+      <a href="{{ url_for('upload') }}">Upload Data</a>
+      <a href="{{ url_for('results') }}" class="active">Results Dashboard</a>
+      <a href="{{ url_for('about') }}">About</a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main" style="overflow-y:auto">
+
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <div class="page-title">Results dashboard</div>
+        <div class="page-sub">
+          {% if summary.is_single_user %}
+            {{ summary.total }} activity days | 1 employee | {{ summary.flagged }} day(s) flagged |
+          {% else %}
+            {{ summary.total }} employee-days | {{ summary.unique_users }} employees | {{ summary.flagged }} flagged above threshold |
+          {% endif %}
+          {{ summary.model_label }} | F1={{ summary.model_f1 }} | AUC={{ summary.model_auc }}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <!-- Threshold selector -->
+        <div style="display:flex;gap:4px;align-items:center;background:rgba(255,255,255,0.7);
+                    padding:4px 8px;border-radius:8px;border:1px solid #b7c4db">
+          <span style="font-size:11px;color:var(--muted);font-weight:600;margin-right:2px">Threshold</span>
+          {% for t in ALLOWED_THRESHOLDS %}
+          <a href="{{ url_for('set_threshold', value=t) }}"
+             class="btn sm {% if active_threshold == t %}primary{% endif %}"
+             style="padding:6px 12px;font-size:11px"
+             title="Flag rows scoring {{ t }} or higher">
+            {{ "%.2f"|format(t) }}
+          </a>
+          {% endfor %}
+        </div>
+        <!-- Model toggle -->
+        <div style="display:flex;gap:4px;background:rgba(255,255,255,0.7);
+                    padding:4px;border-radius:8px;border:1px solid #b7c4db">
+          <a href="{{ url_for('switch_model', model_key='D') }}"
+             class="btn sm {% if active_model == 'D' %}primary{% endif %}"
+             style="padding:6px 14px;font-size:11px"
+             title="Temporal split | F1=0.7820 | AUC=0.9996">
+            Model D
+          </a>
+          <a href="{{ url_for('switch_model', model_key='F') }}"
+             class="btn sm {% if active_model == 'F' %}primary{% endif %}"
+             style="padding:6px 14px;font-size:11px"
+             title="Held-out users | F1=0.7841 | AUC=0.9990">
+            Model F
+          </a>
+        </div>
+        <a href="{{ url_for('upload') }}" class="btn sm">Upload new file</a>
+      </div>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="num">{{ summary.total }}</div>
+        <div class="lbl">{% if summary.is_single_user %}Activity days (1 employee){% else %}Employee-days analysed ({{ summary.unique_users }} employees){% endif %}</div>
+      </div>
+      <div class="info-card">
+        <div class="num" style="color:var(--danger)">{{ summary.flagged }}</div>
+        <div class="lbl">{% if summary.is_single_user %}Suspicious day(s) flagged{% else %}Flagged above threshold{% endif %} (≥ {{ "%.2f"|format(summary.threshold) }})</div>
+      </div>
+      <div class="info-card">
+        <div class="num" style="color:#c0392b">{{ summary.high_risk }}</div>
+        <div class="lbl">High risk (score ≥ 0.80)</div>
+      </div>
+      <div class="info-card">
+        <div class="num">{{ summary.flagged_depts }}</div>
+        <div class="lbl">Departments flagged</div><!-- Number of Unique Departments flagged -->
+      </div>
+    </div>
+
+    {% if timeline_users and timeline_users|length > 1 %}
+    <!-- Employee picker: only employees with more than one day can have timeline -->
+    <div style="background:rgba(255,255,255,0.88);border-radius:10px;
+                padding:12px 18px;border:1px solid rgba(16,24,40,0.07);margin-bottom:14px">
+      <form method="get" action="{{ url_for('results') }}"
+            style="display:flex;align-items:center;gap:10px;margin:0">
+        <label for="employee-select"
+               style="font-size:12px;font-weight:700;color:#0b2a50;text-transform:uppercase;
+                      letter-spacing:0.5px;margin:0">Risk timeline for</label>
+        <select name="employee" id="employee-select" onchange="this.form.submit()"
+                style="padding:6px 10px;font-size:12px;border-radius:6px;
+                       border:1px solid rgba(16,24,40,0.15);background:#fff;min-width:190px">
+          <option value="">Select an employee</option>
+          {% for uid in timeline_users %}
+          <option value="{{ uid }}" {% if uid == selected_user %}selected{% endif %}>{{ uid }}</option>
+          {% endfor %}
+        </select>
+        <span style="font-size:11px;color:var(--muted)">
+          {{ timeline_users|length }} employee(s) can be selected as they have more than one day of activity
+        </span>
+      </form>
+    </div>
+    {% endif %}
+
+    {% if timeline %} <!-- Only draw timeline if timeline data exists -->
+    
+    <!-- Risk timeline - SVG built directly -->
+    {% set n = timeline|length %} <!-- number of days for the selected employee-->
+    {% set step = 920 / (n - 1 if n > 1 else 1) %} <!-- Spacing between Points-->
+    <div style="background:rgba(255,255,255,0.88);border-radius:10px;
+                padding:14px 18px 8px;border:1px solid rgba(16,24,40,0.07)">
+      <div style="font-size:12px;font-weight:700;color:#0b2a50;text-transform:uppercase;
+                  letter-spacing:0.5px;margin-bottom:4px">
+        Risk score timeline : {{ selected_user }}
+        <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">
+           {{ n }} days | dashed line = detection threshold ({{ "%.2f"|format(active_threshold) }}) | click a point for its explanation
+        </span>
+      </div>
+
+      <!--Create SVG BOX-->
+      <svg viewBox="0 0 1000 185" style="width:100%;height:auto;display:block" role="img"  
+           aria-label="Risk score over time for {{ selected_user }}">
+        <!-- y grid + labels -->
+        {% for g in [0.0, 0.5, 1.0] %} <!--Y-axis gridline positions-->
+        <line x1="40" y1="{{ 155 - g * 130 }}" x2="960" y2="{{ 155 - g * 130 }}"
+              stroke="#e3eaf4" stroke-width="1"/> <!--Draw y gridline-->
+        <text x="34" y="{{ 159 - g * 130 }}" font-size="10" fill="#6b7280" text-anchor="end">{{ "%.1f"|format(g) }}</text> <!-- y-axis label -->
+        {% endfor %}
+        <!-- threshold line -->
+        <line x1="40" y1="{{ 155 - active_threshold * 130 }}" x2="960" y2="{{ 155 - active_threshold * 130 }}"
+              stroke="#c0392b" stroke-width="1.2" stroke-dasharray="6 4" opacity="0.65"/>
+        <!-- score line -->
+        <polyline fill="none" stroke="#5b88c9" stroke-width="1.8" opacity="0.85"
+          points="{% for p in timeline %}{{ (40 + loop.index0 * step)|round(1) }},{{ (155 - p.score * 130)|round(1) }} {% endfor %}"/>
+        <!-- points (clickable) -->
+        {% for p in timeline %}
+        <a href="{{ url_for('user_detail', row_key=p.row_key) }}"> <!--clickable points-->
+          <circle cx="{{ (40 + loop.index0 * step)|round(1) }}" cy="{{ (155 - p.score * 130)|round(1) }}"
+                  r="{{ 5.5 if p.flagged else 3.5 }}"
+                  fill="{{ '#c0392b' if p.flagged else '#5b88c9' }}"
+                  stroke="white" stroke-width="1.2" style="cursor:pointer">
+            <title>{{ p.date }} - risk {{ "%.3f"|format(p.score) }}{{ ' - FLAGGED' if p.flagged }}</title> <!-- Text Shown when Hover-->
+          </circle>
+        </a>
+        {% endfor %}
+        <!-- x labels: first and last date -->
+        <text x="40" y="178" font-size="10" fill="#6b7280">{{ timeline[0].date }}</text>
+        <text x="960" y="178" font-size="10" fill="#6b7280" text-anchor="end">{{ timeline[-1].date }}</text>
+      </svg>
+    </div>
+    {% endif %}
+
+    <div class="content">
+
+      <!-- Filters -->
+      <div class="filters">
+        <input type="text" id="search" placeholder="Search user ID..."
+               oninput="filterTable()" style="width:180px"/>
+        <select id="dept-filter" onchange="filterTable()">
+          <option value="">All departments</option>
+          {% set depts = ranked|map(attribute='department')|unique|list %} <!-- Get Unique Department in Ranked-->
+          {% for d in depts|sort %}
+            <option value="{{ d }}">{{ d }}</option> <!--Drop Down Menu-->
+          {% endfor %}
+        </select>
+        <select id="status-filter" onchange="filterTable()">
+          <option value="">All rows</option>
+          <option value="flagged">Flagged only</option>
+          <option value="normal">Normal only</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table" id="results-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>User ID</th>
+              <th>Date</th>
+              <th>Department</th>
+              <th>Role</th>
+              <th>Risk score</th>
+              <th>Top risk factor</th>
+              <th>Status</th>
+              <th>Detail</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            {% for u in ranked %}
+            {% set score = u.risk_score %}
+            {% set risk_cat = 'high' if score >= 0.80 else ('med' if score >= summary.threshold else 'low') %}
+            {% set fill_col = '#c0392b' if score >= 0.80 else ('#e67e22' if score >= summary.threshold else '#27ae60') %}
+            <tr class="data-row"
+                data-user="{{ u.user_id }}"
+                data-dept="{{ u.department }}"
+                data-status="{{ 'flagged' if u.flagged else 'normal' }}"
+                onclick="window.location='{{ url_for('user_detail', row_key=u.row_key) }}'">
+              <td>{{ loop.index }}</td>
+              <td><strong>{{ u.user_id }}</strong></td>
+              <td>{{ u.date }}</td>
+              <td>{{ u.department }}</td>
+              <td>{{ u.role }}</td>
+              <td>
+                <div class="risk-cell">
+                  <span class="risk-bar">
+                    <span class="risk-fill"
+                          style="width:{{ "%.0f"|format(score * 100) }}%;background:{{ fill_col }}">
+                    </span>
+                  </span>
+                  <span class="badge {{ risk_cat }}">{{ "%.3f"|format(score) }}</span>
+                </div>
+              </td>
+              <td style="font-size:12px;color:var(--muted)">{{ u.top_factor }}</td>
+              <td>
+                {% if u.flagged %}
+                  <span class="badge high">Flagged</span>
+                {% else %}
+                  <span class="badge low">Normal</span>
+                {% endif %}
+              </td>
+              <td>
+                <span style="color:var(--accent);font-weight:700">View</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  <!-- Function For Filtering (JavaScript)-->
+function filterTable() { 
+  const search = document.getElementById('search').value.toLowerCase(); <!-- Gets Search Text-->
+  const dept   = document.getElementById('dept-filter').value; <!-- get department -->
+  const status = document.getElementById('status-filter').value; <!-- get status -->
+  document.querySelectorAll('.data-row').forEach(row => { <!-- Loops through every result row -->
+    const matchUser   = row.dataset.user.toLowerCase().includes(search); <!-- Checks if user ID contains search text -->
+    const matchDept   = !dept   || row.dataset.dept   === dept; <!-- If no department selected, pass. Otherwise department must match -->
+    const matchStatus = !status || row.dataset.status === status; <!-- If no status selected, pass. Otherwise status must match. -->
+    row.style.display = (matchUser && matchDept && matchStatus) ? '' : 'none'; <!--Show row if all filters match. Hide it if not.-->
+  });
+}
+</script>
+</body>
+</html>
