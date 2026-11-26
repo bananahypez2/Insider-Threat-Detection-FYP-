@@ -138,9 +138,8 @@ This project uses the **CERT Insider Threat Test Dataset r4.2**: 1,000 employees
 To run the pipeline yourself, place the extracted dataset as follows:
 
 ```
-r4.2/                     logon.csv, device.csv, file.csv, email.csv, http.csv,
-                          LDAP/, psychometric.csv
-answers/                  ground-truth insider files
+r4.2/logon.csv, device.csv, file.csv, email.csv, http.csv, LDAP/, psychometric.csv
+answers/ground-truth insider files
 context_data/
   ├─ LDAP/<snapshot>.csv  earliest LDAP snapshot, used as inference-time context
   └─ psychometric.csv
