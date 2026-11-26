@@ -216,4 +216,3 @@ Every reported figure can be traced to a log in `Scripts Code/Outputs/`.
 ## Licence
 
 Source code: MIT — see [LICENSE](LICENSE).
-The CERT r4.2 dataset is separately licensed and is not redistributed here.
