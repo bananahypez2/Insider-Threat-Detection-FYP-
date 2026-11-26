@@ -173,6 +173,7 @@ To rebuild everything from raw logs, run the scripts in order: `1. EDA` → `2. 
 
 ```
 Context-Aware Anomaly Detection System/   the Flask application
+├─ context_data
 ├─ Context-Aware Anomaly Detection System.py   routes, scoring, SHAP
 ├─ Preprocess_Raw_Logs.py                      raw logs → 32-feature table
 ├─ models/                                     trained artefacts (.pkl)
@@ -189,7 +190,7 @@ Scripts Code/                             the offline pipeline
 ├─ E2. Generate 2026 Demo.py                   synthetic demonstration data
 └─ Outputs/                                    console logs for every script
 
-App Screenshots/                          the running system
+App Screenshots/                          screenshots of the running system
 ```
 
 Every reported figure can be traced to a log in `Scripts Code/Outputs/`.
@@ -197,8 +198,6 @@ Every reported figure can be traced to a log in `Scripts Code/Outputs/`.
 ---
 
 ## Limitations
-
-Stated plainly, because they bound what the results mean:
 
 - **The dataset is synthetic.** CERT r4.2 models a fictional organisation. Its regularity is almost certainly why AUC reaches 0.9996, and that figure should not be read as real-world performance. Validation on genuine organisational logs is the necessary next step.
 - **The suspicious-URL keyword list is tuned to this dataset** and would need rebuilding elsewhere.
