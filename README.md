@@ -214,4 +214,3 @@ Stated plainly, because they bound what the results mean:
 ## Licence
 
 Source code: MIT — see [LICENSE](LICENSE).
-The CERT r4.2 dataset is separately licensed and is not redistributed here.
